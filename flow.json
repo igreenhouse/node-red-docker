@@ -1,0 +1,153 @@
+[
+  {
+    "id": "bf6a6bfb.ad6698",
+    "type": "tab",
+    "label": "Flow 1"
+  },
+  {
+    "id": "48fb29d6.8abc8",
+    "type": "tab",
+    "label": "Flow 2"
+  },
+  {
+    "id": "a6ed7ef6.c3b1b",
+    "type": "serial-port",
+    "z": "",
+    "serialport": "/dev/tty.usbmodem1423",
+    "serialbaud": "9600",
+    "databits": "8",
+    "parity": "none",
+    "stopbits": "1",
+    "newline": "\\n",
+    "bin": "false",
+    "out": "char",
+    "addchar": false
+  },
+  {
+    "id": "cd1cd4b5.89a1b8",
+    "type": "mqtt-broker",
+    "z": "",
+    "broker": "vps364763.ovh.net",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": "",
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": ""
+  },
+  {
+    "id": "45f90f43.5971c8",
+    "type": "influxdb",
+    "z": "",
+    "hostname": "localhost",
+    "port": "8086",
+    "protocol": "http",
+    "database": "iotdb",
+    "name": ""
+  },
+  {
+    "id": "c74aaa1a.718428",
+    "type": "serial in",
+    "z": "bf6a6bfb.ad6698",
+    "name": "USBModem1423 (9600)",
+    "serial": "a6ed7ef6.c3b1b",
+    "x": 180.5,
+    "y": 321,
+    "wires": [
+      [
+        "a999cf.d1e0163"
+      ]
+    ]
+  },
+  {
+    "id": "a999cf.d1e0163",
+    "type": "function",
+    "z": "bf6a6bfb.ad6698",
+    "name": "debugFunction",
+    "func": "    setTimeout(function() { node.status({}); }, 500)\n\n    node.status({fill:\"green\",shape:\"dot\",text:\"updated\"});\n\n    return msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 583.5,
+    "y": 278,
+    "wires": [
+      [
+        "bedd3839.57329"
+      ]
+    ]
+  },
+  {
+    "id": "bedd3839.57329",
+    "type": "mqtt out",
+    "z": "bf6a6bfb.ad6698",
+    "name": "",
+    "topic": "iotdays/sensors",
+    "qos": "",
+    "retain": "",
+    "broker": "cd1cd4b5.89a1b8",
+    "x": 956.5,
+    "y": 243,
+    "wires": []
+  },
+  {
+    "id": "2b58b71.959ec48",
+    "type": "debug",
+    "z": "48fb29d6.8abc8",
+    "name": "",
+    "active": true,
+    "console": "false",
+    "complete": "true",
+    "x": 814.5,
+    "y": 323,
+    "wires": []
+  },
+  {
+    "id": "a52ed1fe.56465",
+    "type": "function",
+    "z": "48fb29d6.8abc8",
+    "name": "Set Measurement",
+    "func": "var prefixT = \"Temp=\";\nvar prefixH = \"Humi=\";\n\nvar m = msg.payload;\n\nvar t = m.indexOf(prefixT);\nvar h = m.indexOf(prefixH);\n\nif(t === 0 || h === 0) {\n    msg.payload = m.substr(prefixT.length).trim(); // prefixT.length == prefixH.length\n    msg.measurement = (t === 0 ? \"temperature\" : \"humidity\");\n    setTimeout(function() { node.status({}); }, 500)\n    node.status({fill:\"green\",shape:\"dot\",text:\"updated\"});\n    return msg;\n} else {\n    return null;\n}",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 530,
+    "y": 441,
+    "wires": [
+      [
+        "fd9f5fc1.24d15",
+        "2b58b71.959ec48"
+      ]
+    ]
+  },
+  {
+    "id": "ccd5b74a.579bb8",
+    "type": "mqtt in",
+    "z": "48fb29d6.8abc8",
+    "name": "",
+    "topic": "iotdays/sensors",
+    "qos": "2",
+    "broker": "cd1cd4b5.89a1b8",
+    "x": 239,
+    "y": 441,
+    "wires": [
+      [
+        "a52ed1fe.56465"
+      ]
+    ]
+  },
+  {
+    "id": "fd9f5fc1.24d15",
+    "type": "influxdb out",
+    "z": "48fb29d6.8abc8",
+    "influxdb": "45f90f43.5971c8",
+    "name": "IoT DB",
+    "measurement": "",
+    "x": 806,
+    "y": 443,
+    "wires": []
+  }
+]
