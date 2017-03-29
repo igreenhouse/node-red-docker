@@ -20,7 +20,8 @@ N.B.: The `-e FLOWS` option is optional, you can also set the `FLOWS` as an env 
 
 ## Configuration
 
-The current flow is configured to work with `/dev/tty.usbmodem1423` serial port (macOS). You have to change this parameter in the [_flows.json_](https://github.com/igreenhouse/node-red-docker/blob/master/flows.json) file, line 16, by the serial port you want to use:
+The current flow is configured to work with `/dev/tty.usbmodem1423` serial port (macOS).  
+You may have to change this parameter in the [_flows.json_](https://github.com/igreenhouse/node-red-docker/blob/master/flows.json) file, line 16, with the serial port you want to use:
 ```javascript
 {
   ...
